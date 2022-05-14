@@ -47,25 +47,16 @@ contract Contract {
     function toString(uint8 value) internal pure returns (string memory) {
         // Inspired by OpenZeppelin's implementation - MIT licence
         // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Strings.sol
-        if (value == 0) {
-            return "0";
-        }
-        if (value < 10) {
-            bytes memory buffer1 = new bytes(1);
-            buffer1[0] = (bytes1(uint8(48 + value)));
-            return string(buffer1);
-        }
-        if (value < 100) {
-            bytes memory buffer2 = new bytes(2);
-            buffer2[1] = bytes1(uint8(48 + value % 10));
-            buffer2[0] = bytes1(uint8(48 + (value/10) % 10));
-            return string(buffer2);
-        }
-        bytes memory buffer3 = new bytes(3);
-        buffer3[2] = bytes1(uint8(48 + value % 10));
-        buffer3[1] = bytes1(uint8(48 + (value/10) % 10));
-        buffer3[0] = bytes1(uint8(48 + (value/100) % 10));
-        return string(buffer3);
+        bytes memory buffer = new bytes(2);
+        buffer[1] = bytes1(uint8(48 + value % 10));
+        buffer[0] = bytes1(uint8(48 + (value/10) % 10));
+        return string(buffer);
+    }
+
+    function toAscii(uint8 value) internal pure returns (bytes memory) {
+        // Inspired by OpenZeppelin's implementation - MIT licence
+        // https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Strings.sol
+        return bytes.concat(bytes1(uint8(48 + (value/10) % 10)), bytes1(uint8(48 + value % 10)));
     }
 
     function getCoordinates(address _addr) internal pure returns (uint8[40] memory) {
@@ -80,6 +71,36 @@ contract Contract {
     }
 
     function getPath(address _addr) public pure returns (string memory) {
+        // uint8[40] memory c = getCoordinates(_addr);
+        uint8[40] memory c;
+        uint160 a = uint160(address(_addr));
+        uint160 mask = 15;
+        for (uint8 i = 40; i > 0; i--) {
+            c[i-1] = uint8((a & mask) + 16);
+            a = a >> 4;
+        }
+        bytes memory y1 = toAscii(c[1]);
+        bytes memory y2 = toAscii(c[3]);
+        bytes memory o = bytes.concat('M',toAscii(c[0]),' ',y1,'C',toAscii(c[2]),' ',y2,' ');
+        bytes memory q = bytes.concat('M',toAscii(c[0]),' ',y1,'C',toAscii(c[2]),' ',y2,' ');
+        y1 = toAscii(c[5]);
+        y2 = toAscii(c[7]);
+        o = bytes.concat(o,toAscii(c[4]),' ',y1,' ',toAscii(c[6]),' ',y2);
+        q = bytes.concat(q,toAscii(48-c[4]),' ',y1,' ',toAscii(48-c[6]),' ',y2);
+        for (uint8 i = 8; i < 40; i+=4) {
+            y1 = toAscii(c[i+1]);
+            y2 = toAscii(c[i+3]);
+            o = bytes.concat(o,'S',toAscii(c[i]),' ',y1,' ',toAscii(c[i+2]),' ',y2);
+            q = bytes.concat(q,'S',toAscii(48-c[i]),' ',y1,' ',toAscii(48-c[i+2]),' ',y2);
+        }
+        y1 = toAscii(2*c[39]-c[37]);
+        y2 = toAscii(c[1]);
+        o = bytes.concat(o,'Q',toAscii(2*c[38]-c[36]),' ',y1,' ',toAscii(c[0]),' ',y2);
+        q = bytes.concat(q,'Q',toAscii(48-(2*c[38]-c[36])),' ',y1,' ',toAscii(48-c[0]),' ',y2);
+        return string(bytes.concat(o,q,"z"));
+    }
+
+    function getPathOld(address _addr) public pure returns (string memory) {
         // uint8[40] memory c = getCoordinates(_addr);
         uint8[40] memory c;
         uint160 a = uint160(address(_addr));
