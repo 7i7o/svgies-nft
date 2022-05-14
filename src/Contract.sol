@@ -59,6 +59,11 @@ contract Contract {
             a = a >> 4;
         }
         return o;
+    }
 
+    function getPath(address _addr) public pure returns (string memory) {
+        string memory o = 'M';
+        o = string.concat(o,"z");
+        return o;
     }
 }
