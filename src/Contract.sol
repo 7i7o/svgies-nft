@@ -62,7 +62,7 @@ contract Contract {
     }
 
     function getPath(address _addr) public pure returns (string memory) {
-        string memory o = 'M';
+        string memory o = 'M8 8';
         o = string.concat(o,"z");
         return o;
     }
