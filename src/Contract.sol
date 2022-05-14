@@ -72,15 +72,22 @@ contract Contract {
         uint8[40] memory o;
         uint160 a = uint160(address(_addr));
         uint160 mask = 15;
-        for (uint256 i = 39; i > 0; i--) {
-            o[i] = uint8((a & mask) + 16);
+        for (uint8 i = 40; i > 0; i--) {
+            o[i-1] = uint8((a & mask) + 16);
             a = a >> 4;
         }
         return o;
     }
 
     function getPath(address _addr) public pure returns (string memory) {
-        uint8[40] memory c = getCoordinates(_addr);
+        // uint8[40] memory c = getCoordinates(_addr);
+        uint8[40] memory c;
+        uint160 a = uint160(address(_addr));
+        uint160 mask = 15;
+        for (uint8 i = 40; i > 0; i--) {
+            c[i-1] = uint8((a & mask) + 16);
+            a = a >> 4;
+        }
         string memory y1 = toString(c[1]);
         string memory y2 = toString(c[3]);
         string memory o = string.concat('M',toString(c[0]),' ',y1,'C',toString(c[2]),' ',y2,' ');
