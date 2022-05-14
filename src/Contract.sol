@@ -49,4 +49,16 @@ contract Contract {
     function getUintAsStr(uint256 num) public pure returns (string memory) {
         return Strings.toString(num);
     }
+
+    function getAddressCoordinates(address _addr) public pure returns (uint8[40] memory) {
+        uint8[40] memory o;
+        uint160 a = uint160(address(_addr));
+        uint160 mask = 15;
+        for (uint256 i = 39; i > 0; i--) {
+            o[i] = uint8(a & mask);
+            a = a >> 4;
+        }
+        return o;
+
+    }
 }
