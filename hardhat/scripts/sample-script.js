@@ -21,15 +21,15 @@ async function main() {
   // gasUsed = txReceipt.gasUsed;
   // console.log(' - getPathBytes used ',gasUsed.toNumber(),' gas')
 
-  tx = await contract.testPathStr01('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
-  txReceipt = await tx.wait()
-  gasUsed = txReceipt.gasUsed;
-  console.log(' - getPathStr01 used ',gasUsed.toNumber(),' gas')
+  // tx = await contract.testPathStr01('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
+  // txReceipt = await tx.wait()
+  // gasUsed = txReceipt.gasUsed;
+  // console.log(' - getPathStr01 used ',gasUsed.toNumber(),' gas')
 
-  tx = await contract.testPathStr02('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
-  txReceipt = await tx.wait()
-  gasUsed = txReceipt.gasUsed;
-  console.log(' - getPathStr02 used ',gasUsed.toNumber(),' gas')
+  // tx = await contract.testPathStr02('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
+  // txReceipt = await tx.wait()
+  // gasUsed = txReceipt.gasUsed;
+  // console.log(' - getPathStr02 used ',gasUsed.toNumber(),' gas')
 
   tx = await contract.testPathStr03('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
   txReceipt = await tx.wait()
