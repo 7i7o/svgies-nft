@@ -34,6 +34,30 @@ contract Contract {
         return string(o);
     }
 
+    function fixOpacity2(uint32 i) public pure returns (string memory) {
+        bytes16 b = 0x30313233343536373839616263646566;
+        bytes memory o = new bytes(8);
+        uint32 mask = 0x0000000f;
+        uint32 mask16 = 0x000000ff;
+        uint32 j = (uint16(i & mask16) * 256) / 1024 + 191;
+        o[7] = bytes1(b[j & mask]);
+        j = j >> 4;
+        o[6] = bytes1(b[j & mask]);
+        i = i >> 8;
+        o[5] = bytes1(b[i & mask]);
+        i = i >> 4;
+        o[4] = bytes1(b[i & mask]);
+        i = i >> 4;
+        o[3] = bytes1(b[i & mask]);
+        i = i >> 4;
+        o[2] = bytes1(b[i & mask]);
+        i = i >> 4;
+        o[1] = bytes1(b[i & mask]);
+        i = i >> 4;
+        o[0] = bytes1(b[i & mask]);
+        return string(o);
+    }
+
     function getColors(address _addr) public pure returns(string[4] memory) {
         string[4] memory s;
         uint256 h = uint(keccak256(abi.encodePacked(_addr)));
@@ -49,6 +73,21 @@ contract Contract {
         return s;
     }
 
+    function getColors2(address _addr) public pure returns(string[4] memory) {
+        string[4] memory s;
+        uint256 h = uint(keccak256(abi.encodePacked(_addr)));
+        uint256 mask = 0x000000000000000000000000ffffffff;
+        h = h >> 128;
+        s[3] = fixOpacity2(uint32(h & mask));
+        h = h >> 32;
+        s[2] = fixOpacity2(uint32(h & mask));
+        h = h >> 32;
+        s[1] = fixOpacity2(uint32(h & mask));
+        h = h >> 32;
+        s[0] = fixOpacity2(uint32(h & mask));
+        return s;
+    }
+    
     function getPath(address _addr) public pure returns (string memory) {
         // 40 integers from each hex character of the address (+16 to avoid negatives later)
         uint8[40] memory c;
@@ -81,10 +120,19 @@ contract Contract {
         return string.concat(o[0], o[1], o[2], o[3], o[4], o[5], o[6], o[7]);
     }
 
-    function testPathGas(address _addr) public returns (string memory) {
+    function getPathGasTest(address _addr) public returns (string memory) {
         test = false;
         return getPath(_addr);
     }
 
+    function getColorsGasTest(address _addr) public returns (string[4] memory) {
+        test = false;
+        return getColors(_addr);
+    }
+
+    function getColors2GasTest(address _addr) public returns (string[4] memory) {
+        test = false;
+        return getColors2(_addr);
+    }
 
 }
