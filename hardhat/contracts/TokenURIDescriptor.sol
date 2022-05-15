@@ -25,60 +25,161 @@ string constant SVGp = '"></path></svg>';
 
 contract TokenURIDescriptor {
 
-    // From OpenZeppelin Contracts utils String.sol
+    // Original: 415157
+    // _HEX_SYM: 415057
+    // No Mask Var: 414953
+    // toHexAddress: 412720
+    // No fixOpacity: 412555
+
     bytes16 private constant _HEX_SYMBOLS = "0123456789abcdef";
-    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {
-        bytes memory buffer = new bytes(2 * length + 2);
+
+    function toHexString(
+        address _addr
+    )
+    internal
+    pure
+    returns (string memory) {
+        bytes memory buffer = new bytes(42);
+        uint160 addr = uint160(_addr);
         buffer[0] = "0";
         buffer[1] = "x";
-        for (uint256 i = 2 * length + 1; i > 1; --i) {
-            buffer[i] = _HEX_SYMBOLS[value & 0xf];
-            value >>= 4;
+        buffer[41] = _HEX_SYMBOLS[addr & 0xf];
+        for (uint256 i = 40; i > 1; i--) {
+            addr >>= 4;
+            buffer[i] = _HEX_SYMBOLS[addr & 0xf];
         }
-        require(value == 0, "Strings: hex length insufficient");
         return string(buffer);
     }
 
-    function fixOpacity(uint32 i) internal pure returns (string memory) {
-        bytes16 b = 0x30313233343536373839616263646566;
-        bytes memory o = new bytes(8);
-        uint32 mask = 0x0000000f;
-        uint32 mask16 = 0x000000ff;
-        uint32 j = (uint16(i & mask16) * 256) / 1024 + 191;
-        o[7] = bytes1(b[j & mask]);
-        j = j >> 4;
-        o[6] = bytes1(b[j & mask]);
-        i = i >> 8;
-        o[5] = bytes1(b[i & mask]);
-        i = i >> 4;
-        o[4] = bytes1(b[i & mask]);
-        i = i >> 4;
-        o[3] = bytes1(b[i & mask]);
-        i = i >> 4;
-        o[2] = bytes1(b[i & mask]);
-        i = i >> 4;
-        o[1] = bytes1(b[i & mask]);
-        i = i >> 4;
-        o[0] = bytes1(b[i & mask]);
-        return string(o);
-    }
+    // function fixOpacity(
+    //     uint32 color
+    // )
+    // internal
+    // pure
+    // returns (string memory) {
+    //     bytes memory o = new bytes(8);
+    //     uint32 opacity = (uint32(color & 0xff) * 256) / 1024 + 191;
+    //     o[7] = bytes1(_HEX_SYMBOLS[opacity & 0xf]);
+    //     opacity >>= 4;
+    //     o[6] = bytes1(_HEX_SYMBOLS[opacity & 0xf]);
+    //     color >>= 8;
+    //     o[5] = bytes1(_HEX_SYMBOLS[color &0xf]);
+    //     color >>= 4;
+    //     o[4] = bytes1(_HEX_SYMBOLS[color &0xf]);
+    //     color >>= 4;
+    //     o[3] = bytes1(_HEX_SYMBOLS[color &0xf]);
+    //     color >>= 4;
+    //     o[2] = bytes1(_HEX_SYMBOLS[color &0xf]);
+    //     color >>= 4;
+    //     o[1] = bytes1(_HEX_SYMBOLS[color &0xf]);
+    //     color >>= 4;
+    //     o[0] = bytes1(_HEX_SYMBOLS[color &0xf]);
+    //     return string(o);
+    // }
 
-    function getColors(address _addr) internal pure returns(string[4] memory) {
+    function getColors(
+        address _addr
+    )
+    internal
+    pure
+    returns(string[4] memory) {
+        uint256 kecc = uint(keccak256(abi.encodePacked(_addr)));
         string[4] memory s;
-        uint256 h = uint(keccak256(abi.encodePacked(_addr)));
-        uint256 mask = 0x000000000000000000000000ffffffff;
-        h = h >> 128;
-        s[3] = fixOpacity(uint32(h & mask));
-        h = h >> 32;
-        s[2] = fixOpacity(uint32(h & mask));
-        h = h >> 32;
-        s[1] = fixOpacity(uint32(h & mask));
-        h = h >> 32;
-        s[0] = fixOpacity(uint32(h & mask));
+        bytes memory fixedColor = new bytes(8);
+        kecc >>= 128;
+        uint32 color;
+        uint32 opacity;
+        color = uint32(kecc & 0xffffffff);
+        opacity = (uint32(color & 0xff) * 256) / 1024 + 191;
+        fixedColor[7] = _HEX_SYMBOLS[opacity & 0xf];
+        opacity >>= 4;
+        fixedColor[6] = _HEX_SYMBOLS[opacity & 0xf];
+        color >>= 8;
+        fixedColor[5] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[4] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[3] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[2] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[1] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[0] = _HEX_SYMBOLS[color & 0xf];
+        s[3] = string(fixedColor);
+        // s[3] = fixOpacity(uint32(kecc & 0xffffffff));
+        fixedColor = new bytes(8);
+        kecc >>= 32;
+        color = uint32(kecc & 0xffffffff);
+        opacity = (uint32(color & 0xff) * 256) / 1024 + 191;
+        fixedColor[7] = _HEX_SYMBOLS[opacity & 0xf];
+        opacity >>= 4;
+        fixedColor[6] = _HEX_SYMBOLS[opacity & 0xf];
+        color >>= 8;
+        fixedColor[5] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[4] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[3] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[2] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[1] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[0] = _HEX_SYMBOLS[color & 0xf];
+        s[2] = string(fixedColor);
+        // s[2] = fixOpacity(uint32(kecc & 0xffffffff));
+        fixedColor = new bytes(8);
+        kecc >>= 32;
+        color = uint32(kecc & 0xffffffff);
+        opacity = (uint32(color & 0xff) * 256) / 1024 + 191;
+        fixedColor[7] = _HEX_SYMBOLS[opacity & 0xf];
+        opacity >>= 4;
+        fixedColor[6] = _HEX_SYMBOLS[opacity & 0xf];
+        color >>= 8;
+        fixedColor[5] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[4] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[3] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[2] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[1] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[0] = _HEX_SYMBOLS[color & 0xf];
+        s[1] = string(fixedColor);
+        // s[1] = fixOpacity(uint32(kecc & 0xffffffff));
+        fixedColor = new bytes(8);
+        kecc >>= 32;
+        color = uint32(kecc & 0xffffffff);
+        opacity = (uint32(color & 0xff) * 256) / 1024 + 191;
+        fixedColor[7] = _HEX_SYMBOLS[opacity & 0xf];
+        opacity >>= 4;
+        fixedColor[6] = _HEX_SYMBOLS[opacity & 0xf];
+        color >>= 8;
+        fixedColor[5] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[4] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[3] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[2] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[1] = _HEX_SYMBOLS[color & 0xf];
+        color >>= 4;
+        fixedColor[0] = _HEX_SYMBOLS[color & 0xf];
+        s[0] = string(fixedColor);
+        // s[0] = fixOpacity(uint32(kecc & 0xffffffff));
         return s;
     }
     
-    function getPath(address _addr) internal pure returns (string memory) {
+    function getPath(
+        address _addr
+    )
+    internal
+    pure
+    returns (string memory) {
         // 40 integers from each hex character of the address (+16 to avoid negatives later)
         uint8[40] memory c;
         uint160 a = uint160(address(_addr));
@@ -110,7 +211,12 @@ contract TokenURIDescriptor {
         return string.concat(o[0], o[1], o[2], o[3], o[4], o[5], o[6], o[7]);
     }
 
-    function getSVG(address _addr) internal pure returns (string memory) {
+    function getSVG(
+        address _addr
+    )
+    internal
+    pure
+    returns (string memory) {
         string[4] memory c = getColors(_addr);
         string memory c01 = string.concat(c[0], c[1]);
         string memory c232 = string.concat(c[2], c[3], c[2]);
@@ -122,17 +228,24 @@ contract TokenURIDescriptor {
     }
 
     // function getEncodedSVG(address _addr, string calldata name, string calldata symbol) public pure returns (string memory) {
-    function tokenURI(address _addr, string calldata _name, string calldata _symbol) public pure returns (string memory) {
+    function tokenURI(
+        address _addr,
+        string calldata _name,
+        string calldata _symbol
+    )
+    public
+    pure
+    returns (string memory) {
 
         string[9] memory json;
         
         json[0] = '{"name":"';
         json[1] = _name;
         json[2] = ' #';
-        json[3] = toHexString(uint256(uint160(_addr)), 20);
+        json[3] = toHexString(_addr);
         json[4] = '","symbol":"';
         json[5] = _symbol;
-        json[6] = '","description":"On-Chain NFT for ETH Address SVG Representation","image": "data:image/svg+xml;base64,';
+        json[6] = '","description":"Wallet SVG Representation","image": "data:image/svg+xml;base64,';
         json[7] = Base64.encode(bytes(getSVG(_addr)));
         json[8] = '"}';
 
@@ -143,8 +256,15 @@ contract TokenURIDescriptor {
     }
 
     bool test = false;
-    function tokenURIGasTest(address _addr, string calldata _name, string calldata _symbol) public returns (string memory) {
+    function tokenURIGasTest(
+        address _addr,
+        string calldata _name,
+        string calldata _symbol
+    )
+    public
+    returns (string memory) {
         test = false;
         return tokenURI(_addr, _name, _symbol);
     }
+
 }
