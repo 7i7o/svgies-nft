@@ -1,40 +1,31 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity 0.8.12;
 
-
+string constant SVGa = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 8 32 32" width="200" height="200">'
+                            '<radialGradient id="'; // C0 C1
+string constant SVGb = '"><stop stop-color="#'; // C0
+string constant SVGc = '" offset="0"></stop><stop stop-color="#'; // C1
+string constant SVGd = '" offset="1"></stop></radialGradient>'
+                        '<rect x="8" y="8" width="100%" height="100%" opacity="1" fill="white"></rect>'
+                        '<rect x="8" y="8" width="100%" height="100%" opacity=".5" fill="url(#'; // C0 C1
+string constant SVGe = ')"></rect><linearGradient id="'; // C2 C3 C2
+string constant SVGf = '"><stop stop-color="#'; // C2
+string constant SVGg = '" offset="0"></stop><stop stop-color="#'; // C3
+string constant SVGh = '" offset=".5"></stop><stop stop-color="#'; // C2
+string constant SVGi = '" offset="1"></stop></linearGradient><linearGradient id="'; // C3 C2 C3
+string constant SVGj = '"><stop stop-color="#'; // C3
+string constant SVGk = '" offset="0"></stop><stop stop-color="#'; // C2
+string constant SVGl = '" offset=".5"></stop><stop stop-color="#'; // C3
+string constant SVGm = '" offset="1"></stop></linearGradient><path fill="url(#'; // C2 C3 C2 
+string constant SVGn = ')" stroke-width="0.1" stroke="url(#'; // C3 C2 C3
+string constant SVGo = ')"d="'; // PATH
+string constant SVGp = '"></path></svg>';
 
 contract Contract {
 
-    bool private test;
-
-    function uint8tohexchar(uint8 i) public pure returns (uint8) {
-        return (i > 9) ? (i + 87) : (i + 48); // (i > 9) ? (ascii a-f) : (ascii 0-9)
-    }
+    bool test = false;
 
     function fixOpacity(uint32 i) public pure returns (string memory) {
-        bytes memory o = new bytes(8);
-        uint32 mask = 0x0000000f;
-        uint32 mask16 = 0x000000ff;
-        uint32 j = (uint16(i & mask16) * 256) / 1024 + 191;
-        o[7] = bytes1(uint8tohexchar(uint8(j & mask)));
-        j = j >> 4;
-        o[6] = bytes1(uint8tohexchar(uint8(j & mask)));
-        i = i >> 8;
-        o[5] = bytes1(uint8tohexchar(uint8(i & mask)));
-        i = i >> 4;
-        o[4] = bytes1(uint8tohexchar(uint8(i & mask)));
-        i = i >> 4;
-        o[3] = bytes1(uint8tohexchar(uint8(i & mask)));
-        i = i >> 4;
-        o[2] = bytes1(uint8tohexchar(uint8(i & mask)));
-        i = i >> 4;
-        o[1] = bytes1(uint8tohexchar(uint8(i & mask)));
-        i = i >> 4;
-        o[0] = bytes1(uint8tohexchar(uint8(i & mask)));
-        return string(o);
-    }
-
-    function fixOpacity2(uint32 i) public pure returns (string memory) {
         bytes16 b = 0x30313233343536373839616263646566;
         bytes memory o = new bytes(8);
         uint32 mask = 0x0000000f;
@@ -72,21 +63,6 @@ contract Contract {
         s[0] = fixOpacity(uint32(h & mask));
         return s;
     }
-
-    function getColors2(address _addr) public pure returns(string[4] memory) {
-        string[4] memory s;
-        uint256 h = uint(keccak256(abi.encodePacked(_addr)));
-        uint256 mask = 0x000000000000000000000000ffffffff;
-        h = h >> 128;
-        s[3] = fixOpacity2(uint32(h & mask));
-        h = h >> 32;
-        s[2] = fixOpacity2(uint32(h & mask));
-        h = h >> 32;
-        s[1] = fixOpacity2(uint32(h & mask));
-        h = h >> 32;
-        s[0] = fixOpacity2(uint32(h & mask));
-        return s;
-    }
     
     function getPath(address _addr) public pure returns (string memory) {
         // 40 integers from each hex character of the address (+16 to avoid negatives later)
@@ -120,19 +96,19 @@ contract Contract {
         return string.concat(o[0], o[1], o[2], o[3], o[4], o[5], o[6], o[7]);
     }
 
-    function getPathGasTest(address _addr) public returns (string memory) {
-        test = false;
-        return getPath(_addr);
+    function getSVG(address _addr) public pure returns (string memory) {
+        string[4] memory c = getColors(_addr);
+        string memory c01 = string.concat(c[0], c[1]);
+        string memory c232 = string.concat(c[2], c[3], c[2]);
+        string memory c323 = string.concat(c[3], c[2], c[3]);
+        string memory path = getPath(_addr);
+        string memory o = string.concat(SVGa, c01, SVGb, c[0], SVGc, c[1], SVGd, c01, SVGe, c232, SVGf);
+        o = string.concat(o, c[2], SVGg, c[3], SVGh, c[2], SVGi, c323, SVGj, c[3], SVGk);
+        return string.concat(o, c[2], SVGl, c[3], SVGm, c232, SVGn, c323, SVGo, path, SVGp);
     }
 
-    function getColorsGasTest(address _addr) public returns (string[4] memory) {
+    function getSVGGasTest(address _addr) public returns (string memory) {
         test = false;
-        return getColors(_addr);
+        return getSVG(_addr);
     }
-
-    function getColors2GasTest(address _addr) public returns (string[4] memory) {
-        test = false;
-        return getColors2(_addr);
-    }
-
 }

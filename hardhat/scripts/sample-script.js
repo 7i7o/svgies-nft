@@ -9,30 +9,23 @@ async function main() {
   await contract.deployed();
   console.log(CONTRACT_NAME, " deployed to:", contract.address);
 
-  let tx
-  let txReceipt
-  let gasUsed
+  // let tx
+  // let txReceipt
+  // let gasUsed
+  // tx = await contract.getSVGGasTest('0xC53128eAe55d64C2bD70F842247a0E8D27647241')
+  // txReceipt = await tx.wait()
+  // gasUsed = txReceipt.gasUsed;
+  // console.log(' - getSVG used ',gasUsed.toNumber(),' gas')
 
-  tx = await contract.getPathGasTest('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
-  txReceipt = await tx.wait()
-  gasUsed = txReceipt.gasUsed;
-  console.log(' - getPath used ',gasUsed.toNumber(),' gas')
+  // let colors = await contract.getColors('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
+  // console.log('getColors: ', colors)
 
-  tx = await contract.getColorsGasTest('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
-  txReceipt = await tx.wait()
-  gasUsed = txReceipt.gasUsed;
-  console.log(' - getColors used ',gasUsed.toNumber(),' gas')
-  
-  tx = await contract.getColors2GasTest('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
-  txReceipt = await tx.wait()
-  gasUsed = txReceipt.gasUsed;
-  console.log(' - getColors2 used ',gasUsed.toNumber(),' gas')
-  
-  let colors = await contract.getColors('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
-  let colors2 = await contract.getColors2('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
+  // let path = await contract.getPath('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
+  // console.log('getPath: ', path)
 
-  console.log('getColors:  ', colors)
-  console.log('getColors2: ', colors2)
+  let svg = await contract.getSVG('0xC53128eAe55d64C2bD70F842247a0E8D27647241')
+  console.log('getSVG: ', svg)
+
 }
 
 // Don't touch
