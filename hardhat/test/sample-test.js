@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-const CONTRACT_NAME = 'Contract';
+const CONTRACT_NAME = 'TokenURIDescriptor';
 
 describe(CONTRACT_NAME, function () {
 

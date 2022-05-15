@@ -1,6 +1,6 @@
 const hre = require("hardhat");
 
-const CONTRACT_NAME = 'Contract';
+const CONTRACT_NAME = 'TokenURIDescriptor';
 
 async function main() {
   // We get the contract to deploy
@@ -9,13 +9,13 @@ async function main() {
   await contract.deployed();
   console.log(CONTRACT_NAME, " deployed to:", contract.address);
 
-  // let tx
-  // let txReceipt
-  // let gasUsed
-  // tx = await contract.getSVGGasTest('0xC53128eAe55d64C2bD70F842247a0E8D27647241')
-  // txReceipt = await tx.wait()
-  // gasUsed = txReceipt.gasUsed;
-  // console.log(' - getSVG used ',gasUsed.toNumber(),' gas')
+  let tx
+  let txReceipt
+  let gasUsed
+  tx = await contract.tokenURIGasTest('0xC53128eAe55d64C2bD70F842247a0E8D27647241', 'SVGie', 'SVGie')
+  txReceipt = await tx.wait()
+  gasUsed = txReceipt.gasUsed;
+  console.log(' - getEncodedSVG used ',gasUsed.toNumber(),' gas')
 
   // let colors = await contract.getColors('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
   // console.log('getColors: ', colors)
@@ -23,8 +23,8 @@ async function main() {
   // let path = await contract.getPath('0xB563C841C6FdE27A8e533E67fb15f4C270860BED')
   // console.log('getPath: ', path)
 
-  let svg = await contract.getSVG('0xC53128eAe55d64C2bD70F842247a0E8D27647241')
-  console.log('getSVG: ', svg)
+  let svg = await contract.tokenURI('0xC53128eAe55d64C2bD70F842247a0E8D27647241', 'SVGie', 'SVGie')
+  console.log(svg)
 
 }
 

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.12;
 
+import { Base64 } from './Base64.sol';
+
 string constant SVGa = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 8 32 32" width="200" height="200">'
                             '<radialGradient id="'; // C0 C1
 string constant SVGb = '"><stop stop-color="#'; // C0
@@ -18,14 +20,26 @@ string constant SVGk = '" offset="0"></stop><stop stop-color="#'; // C2
 string constant SVGl = '" offset=".5"></stop><stop stop-color="#'; // C3
 string constant SVGm = '" offset="1"></stop></linearGradient><path fill="url(#'; // C2 C3 C2 
 string constant SVGn = ')" stroke-width="0.1" stroke="url(#'; // C3 C2 C3
-string constant SVGo = ')"d="'; // PATH
+string constant SVGo = ')" d="'; // PATH
 string constant SVGp = '"></path></svg>';
 
-contract Contract {
+contract TokenURIDescriptor {
 
-    bool test = false;
+    // From OpenZeppelin Contracts utils String.sol
+    bytes16 private constant _HEX_SYMBOLS = "0123456789abcdef";
+    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {
+        bytes memory buffer = new bytes(2 * length + 2);
+        buffer[0] = "0";
+        buffer[1] = "x";
+        for (uint256 i = 2 * length + 1; i > 1; --i) {
+            buffer[i] = _HEX_SYMBOLS[value & 0xf];
+            value >>= 4;
+        }
+        require(value == 0, "Strings: hex length insufficient");
+        return string(buffer);
+    }
 
-    function fixOpacity(uint32 i) public pure returns (string memory) {
+    function fixOpacity(uint32 i) internal pure returns (string memory) {
         bytes16 b = 0x30313233343536373839616263646566;
         bytes memory o = new bytes(8);
         uint32 mask = 0x0000000f;
@@ -49,7 +63,7 @@ contract Contract {
         return string(o);
     }
 
-    function getColors(address _addr) public pure returns(string[4] memory) {
+    function getColors(address _addr) internal pure returns(string[4] memory) {
         string[4] memory s;
         uint256 h = uint(keccak256(abi.encodePacked(_addr)));
         uint256 mask = 0x000000000000000000000000ffffffff;
@@ -64,7 +78,7 @@ contract Contract {
         return s;
     }
     
-    function getPath(address _addr) public pure returns (string memory) {
+    function getPath(address _addr) internal pure returns (string memory) {
         // 40 integers from each hex character of the address (+16 to avoid negatives later)
         uint8[40] memory c;
         uint160 a = uint160(address(_addr));
@@ -96,7 +110,7 @@ contract Contract {
         return string.concat(o[0], o[1], o[2], o[3], o[4], o[5], o[6], o[7]);
     }
 
-    function getSVG(address _addr) public pure returns (string memory) {
+    function getSVG(address _addr) internal pure returns (string memory) {
         string[4] memory c = getColors(_addr);
         string memory c01 = string.concat(c[0], c[1]);
         string memory c232 = string.concat(c[2], c[3], c[2]);
@@ -107,8 +121,30 @@ contract Contract {
         return string.concat(o, c[2], SVGl, c[3], SVGm, c232, SVGn, c323, SVGo, path, SVGp);
     }
 
-    function getSVGGasTest(address _addr) public returns (string memory) {
+    // function getEncodedSVG(address _addr, string calldata name, string calldata symbol) public pure returns (string memory) {
+    function tokenURI(address _addr, string calldata _name, string calldata _symbol) public pure returns (string memory) {
+
+        string[9] memory json;
+        
+        json[0] = '{"name":"';
+        json[1] = _name;
+        json[2] = ' #';
+        json[3] = toHexString(uint256(uint160(_addr)), 20);
+        json[4] = '","symbol":"';
+        json[5] = _symbol;
+        json[6] = '","description":"On-Chain NFT for ETH Address SVG Representation","image": "data:image/svg+xml;base64,';
+        json[7] = Base64.encode(bytes(getSVG(_addr)));
+        json[8] = '"}';
+
+        string memory output = string.concat(json[0], json[1], json[2], json[3], json[4], json[5], json[6], json[7], json[8]);
+
+        return string.concat("data:application/json;base64,", Base64.encode(bytes(output)));
+
+    }
+
+    bool test = false;
+    function tokenURIGasTest(address _addr, string calldata _name, string calldata _symbol) public returns (string memory) {
         test = false;
-        return getSVG(_addr);
+        return tokenURI(_addr, _name, _symbol);
     }
 }
