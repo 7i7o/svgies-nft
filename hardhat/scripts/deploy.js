@@ -22,6 +22,8 @@ async function main() {
   let txReceipt
   let gasUsed
   let balance
+  let tokenId
+  let result
 
   balance = await contract.provider.getBalance(contract.address)
   console.log("Contract Balance: ", balance)
@@ -43,9 +45,27 @@ async function main() {
   // console.log("Contract Balance: ", balance)
 
   // Check SVG by tokenURI
-  let tokenId = ethers.BigNumber.from(WALLETMM)
-  let svg = await contract.tokenURI(tokenId)
-  console.log(svg)
+  // tokenId = ethers.BigNumber.from(WALLETMM)
+  // result = await contract.tokenURI(tokenId)
+  // console.log(result)
+
+  // Check if mint is active
+  result = await contract.isMintActive()
+  console.log('Mint Active: ', result)
+
+  // Check owner
+  result = await contract.getOwner()
+  console.log('Owner account: ', result)
+
+  // Toggle mintActive
+  // tx = await contract.toggleMintActive()
+  // txReceipt = await tx.wait()
+  // gasUsed = txReceipt.gasUsed;
+  // console.log(' - toggleMintActive used ',gasUsed.toNumber(),' gas')
+  
+  // ReCheck if mint is active
+  result = await contract.isMintActive()
+  console.log('Mint Active: ', result)
 
   // Set Mint to Inactive
   // tx = await contract.toggleMintActive()

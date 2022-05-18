@@ -30,6 +30,12 @@ contract SVGie is ERC721 {
         _safeMint(msg.sender, uint256(uint160(msg.sender)));
     }
 
+    function teamMint(address _to) public {
+        if (msg.sender != owner) revert OnlyOwner();
+        totalSupply++;
+        _safeMint(_to, uint256(uint160(_to)));
+    }
+
     function burn(uint256 tokenId) public virtual {
     // function burn() public virtual {
         if (msg.sender != ownerOf(tokenId)) revert NotOwnerOf(tokenId);
