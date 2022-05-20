@@ -3,20 +3,19 @@ const ethers = hre.ethers;
 const waffle = hre.waffle;
 
 const CONTRACT_NAME = 'SVGie';
-// const MINT_PRICE = '0.01' // in Eth/Matic
-const MINT_PRICE = '15' // in Eth/Matic
+const MINT_PRICE = '0.005' // in Eth/Matic
 // Mumbai 00: 0xacB69A6A9c5AA171Addd0a178507154345654bF9
-// const CONTRACT_ADDRESS = '0xacB69A6A9c5AA171Addd0a178507154345654bF9';
+const CONTRACT_ADDRESS = '0xacB69A6A9c5AA171Addd0a178507154345654bF9';
 
-// const WALLETHH = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266' // Hardhat Default
+const WALLETHH = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266' // Hardhat Default
 const WALLETMM = '0x0b29CF9b4D48BF75Bd1c2681cA07aB102F85c98C' // 7i7o-domains
 
 async function main() {
   // We get the contract to deploy
   const Contract = await hre.ethers.getContractFactory(CONTRACT_NAME);
-  // const contract = await Contract.attach(CONTRACT_ADDRESS);
-  const contract = await Contract.deploy(ethers.utils.parseEther(MINT_PRICE));
-  await contract.deployed();
+  const contract = await Contract.attach(CONTRACT_ADDRESS);
+  // const contract = await Contract.deploy(ethers.utils.parseEther(MINT_PRICE));
+  // await contract.deployed();
   console.log(CONTRACT_NAME, " deployed to:", contract.address);
 
   let tx
@@ -65,8 +64,8 @@ async function main() {
   // console.log(' - toggleMintActive used ',gasUsed.toNumber(),' gas')
   
   // ReCheck if mint is active
-  // result = await contract.isMintActive()
-  // console.log('Mint Active: ', result)
+  result = await contract.isMintActive()
+  console.log('Mint Active: ', result)
 
   // Set Mint to Inactive
   // tx = await contract.toggleMintActive()
@@ -80,20 +79,8 @@ async function main() {
   // gasUsed = txReceipt.gasUsed;
   // console.log(' - withdraw used ',gasUsed.toNumber(),' gas')
 
-  // balance = await contract.provider.getBalance(contract.address)
-  // console.log("Contract Balance: ", balance)
-
-  // Mint 1 NFT by Team
-  tx = await contract.teamMint()
-  txReceipt = await tx.wait()
-  gasUsed = txReceipt.gasUsed;
-  console.log(' - teamMint used ',gasUsed.toNumber(),' gas')
-  console.log(txReceipt.logs)
-
-  // Check SVG by tokenURI
-  tokenId = ethers.BigNumber.from(WALLETMM)
-  result = await contract.tokenURI(tokenId)
-  console.log(result)
+  balance = await contract.provider.getBalance(contract.address)
+  console.log("Contract Balance: ", balance)
 
 }
 

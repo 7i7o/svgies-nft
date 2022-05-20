@@ -1,5 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
 require('dotenv').config();
+require("@nomiclabs/hardhat-etherscan");
 require("hardhat-gas-reporter");
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -24,25 +25,30 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 100,
+        runs: 10,
       },
     },
   },
   networks: {
-  //   rinkeby: {
-  //     url: process.env.ALCHEMY_KEY_RINKEBY_STAGING,
-  //     accounts: [process.env.RINKEBY_PRIVATE_KEY],
-  //   },
+    //   rinkeby: {
+    //     url: process.env.ALCHEMY_KEY_RINKEBY_STAGING,
+    //     accounts: [process.env.RINKEBY_PRIVATE_KEY],
+    //   },
     mumbai: {
       url: process.env.ALCHEMY_KEY_MUMBAI_STAGING,
-      accounts: [ process.env.MUMBAI_PRIVATE_KEY ],
-    }
+      accounts: [process.env.MUMBAI_PRIVATE_KEY],
+    },
+    // polygon: {
+    //   url: process.env.POLYGON_ALCHEMY_KEY,
+    //   accounts: [process.env.POLYGON_PRIVATE_KEY],
+    // },
   },
-  // etherscan: {
-  //   // Your API key for Etherscan
-  //   // Obtain one at https://etherscan.io/
-  //   apiKey: process.env.ETHERSCAN_API_KEY
-  // }
+  etherscan: {
+    // Your API key for Etherscan
+    // Obtain one at https://etherscan.io/
+    // apiKey: process.env.ETHERSCAN_API_KEY
+    apiKey: process.env.POLYGON_ETHERSCAN_API_KEY,
+  },
   gasReporter: {
     enabled: true
   }
