@@ -2,13 +2,16 @@
 pragma solidity 0.8.12;
 
 // import "./lib/ERC721/ERC721NonTransf.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@7i7o/tokengate/src/ERC721TGNT.sol";
+// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { TokenURIDescriptor } from "./lib/TokenURIDescriptor.sol";
 
 // contract SVGie is ERC721NonTransf {
-contract SVGie is ERC721 {
+contract SVGie is ERC721TGNT {
+// contract SVGie is ERC721 {
 
     address private owner;
+    address private donationAddress;
     uint256 private totalSupply;
     uint256 private price;
     bool private mintActive;
@@ -18,7 +21,8 @@ contract SVGie is ERC721 {
     error OnlyOwner();
 
     // constructor(uint256 mintPrice) ERC721NonTransf("SVGie", "SVGie") {
-    constructor(uint256 mintPrice) ERC721("SVGie", "SVGie") {
+    constructor(uint256 mintPrice) ERC721TGNT("SVGie", "SVGie") {
+    // constructor(uint256 mintPrice) ERC721("SVGie", "SVGie") {
         owner = msg.sender;
         setPrice(mintPrice);
     }
@@ -44,11 +48,18 @@ contract SVGie is ERC721 {
         // _burn(uint256(uint160(msg.sender)));
     }
 
+    // function teamBurn(uint256 tokenId) public {
+    //     if (msg.sender != owner) revert OnlyOwner();
+    //     totalSupply--;
+    //     _burn(tokenId);
+    // }
+
     function tokenURI(uint256 tokenId)
         public
         view
         // override(ERC721NonTransf)
-        override(ERC721)
+        override(ERC721TGNT)
+        // override(ERC721)
         returns (string memory)
     {
         // if (!_exists(tokenId)) revert NonExistentToken(tokenId);
@@ -68,6 +79,15 @@ contract SVGie is ERC721 {
     function setOwner(address newOwner) public {
         if (msg.sender != owner) revert OnlyOwner();
         owner = newOwner;
+    }
+
+    function getDonationAddress() public view returns (address) {
+        return donationAddress;
+    }
+
+    function setDonationAddress(address newDonationAddress) public {
+        if (msg.sender != owner) revert OnlyOwner();
+        donationAddress = newDonationAddress;
     }
 
     function getPrice() public view returns (uint256) {
@@ -95,10 +115,19 @@ contract SVGie is ERC721 {
     function withdraw() public {
         // if (msg.sender != owner) revert OnlyOwner();
         uint256 amount = address(this).balance;
+        bool success;
         // Revert if no funds
         require(amount > 0,"Balance is 0");
         // Withdraw funds.
-        (bool success, ) = payable(owner).call{value: amount}("");
+        if (donationAddress == address(0x0)) {
+            (success, ) = payable(owner).call{value: amount}("");
+            require(success, "Withdraw failed");
+            return;
+        }
+        
+        amount /= 2;
+        (success, ) = payable(donationAddress).call{value: amount}("");
+        (success, ) = payable(owner).call{value: address(this).balance}("");
         require(success, "Withdraw failed");
     }
 
