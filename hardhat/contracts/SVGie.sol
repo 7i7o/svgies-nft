@@ -24,20 +24,19 @@ contract SVGie is ERC721TGNT {
     error OnlyOwner();
 
     constructor(uint256 mintPrice) ERC721TGNT("SVGie", "SVGie") {
-    // constructor(uint256 mintPrice) ERC721("SVGie", "SVGie") {
         owner = msg.sender;
         nextPrice = mintPrice;
     }
 
-    function safeMint() public payable {
+    function safeMint(address _to) public payable {
         require(mintActive, "Mint is not active");
         require(msg.value >= price, "Value sent < Mint Price");
-        if (++totalSupply >= nextPrice*slowFactor) {
+        if (++totalSupply >= nextPrice * slowFactor) {
             uint256 oldPrice = price;
             price = nextPrice;
             nextPrice += oldPrice;
         }
-        _safeMint(msg.sender, uint256(uint160(msg.sender)));
+        _safeMint(_to, uint256(uint160(_to)));
     }
 
     function teamMint(address _to) public {
@@ -47,28 +46,17 @@ contract SVGie is ERC721TGNT {
     }
 
     function burn(uint256 tokenId) public virtual {
-    // function burn() public virtual {
         if (msg.sender != ownerOf(tokenId)) revert NotOwnerOf(tokenId);
         totalSupply--;
         _burn(tokenId);
-        // _burn(uint256(uint160(msg.sender)));
     }
-
-    // function teamBurn(uint256 tokenId) public {
-    //     if (msg.sender != owner) revert OnlyOwner();
-    //     totalSupply--;
-    //     _burn(tokenId);
-    // }
 
     function tokenURI(uint256 tokenId)
         public
         view
-        // override(ERC721NonTransf)
         override(ERC721TGNT)
-        // override(ERC721)
         returns (string memory)
     {
-        // if (!_exists(tokenId)) revert NonExistentToken(tokenId);
         require(_exists(tokenId), "SVGie: Non Existent TokenId");
         return
             TokenURIDescriptor.tokenURI(
@@ -137,7 +125,6 @@ contract SVGie is ERC721TGNT {
     }
 
     function withdraw() public {
-        // if (msg.sender != owner) revert OnlyOwner();
         uint256 amount = address(this).balance;
         bool success;
         // Revert if no funds
