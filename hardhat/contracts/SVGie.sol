@@ -13,24 +13,30 @@ contract SVGie is ERC721TGNT {
     address private owner;
     address private donationAddress;
     uint256 private totalSupply;
+    uint256 private totalSold;
     uint256 private price;
+    uint256 private nextPrice;
+    uint256 private slowFactor;
     bool private mintActive;
 
     error NotOwnerOf(uint256 tokenId);
 
     error OnlyOwner();
 
-    // constructor(uint256 mintPrice) ERC721NonTransf("SVGie", "SVGie") {
     constructor(uint256 mintPrice) ERC721TGNT("SVGie", "SVGie") {
     // constructor(uint256 mintPrice) ERC721("SVGie", "SVGie") {
         owner = msg.sender;
-        setPrice(mintPrice);
+        nextPrice = mintPrice;
     }
 
     function safeMint() public payable {
         require(mintActive, "Mint is not active");
         require(msg.value >= price, "Value sent < Mint Price");
-        totalSupply++;
+        if (++totalSupply >= nextPrice*slowFactor) {
+            uint256 oldPrice = price;
+            price = nextPrice;
+            nextPrice += oldPrice;
+        }
         _safeMint(msg.sender, uint256(uint160(msg.sender)));
     }
 
@@ -97,6 +103,24 @@ contract SVGie is ERC721TGNT {
     function setPrice(uint256 mintPrice) public {
         if (msg.sender != owner) revert OnlyOwner();
         price = mintPrice;
+    }
+
+    function getNextPrice() public view returns (uint256) {
+        return nextPrice;
+    }
+
+    function setNextPrice(uint256 mintPrice) public {
+        if (msg.sender != owner) revert OnlyOwner();
+        nextPrice = mintPrice;
+    }
+
+    function getSlowFactor() public view returns (uint256) {
+        return slowFactor;
+    }
+
+    function setSlowFactor(uint256 factor) public {
+        if (msg.sender != owner) revert OnlyOwner();
+        slowFactor = factor;
     }
 
     function isMintActive() public view returns (bool) {
