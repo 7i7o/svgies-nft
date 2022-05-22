@@ -1,37 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.12;
 
-// import "./lib/ERC721/ERC721NonTransf.sol";
 import "@7i7o/tokengate/src/ERC721TGNT.sol";
-// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { TokenURIDescriptor } from "./lib/TokenURIDescriptor.sol";
 
-// contract SVGie is ERC721NonTransf {
 contract SVGie is ERC721TGNT {
-// contract SVGie is ERC721 {
 
     address private owner;
     address private donationAddress;
     uint256 private totalSupply;
     uint256 private price;
+    uint256 private nextPrice;
+    uint256 private slowFactor;
     bool private mintActive;
 
     error NotOwnerOf(uint256 tokenId);
 
     error OnlyOwner();
 
-    // constructor(uint256 mintPrice) ERC721NonTransf("SVGie", "SVGie") {
     constructor(uint256 mintPrice) ERC721TGNT("SVGie", "SVGie") {
-    // constructor(uint256 mintPrice) ERC721("SVGie", "SVGie") {
         owner = msg.sender;
-        setPrice(mintPrice);
+        nextPrice = mintPrice;
     }
 
-    function safeMint() public payable {
+    function safeMint(address _to) public payable {
         require(mintActive, "Mint is not active");
         require(msg.value >= price, "Value sent < Mint Price");
-        totalSupply++;
-        _safeMint(msg.sender, uint256(uint160(msg.sender)));
+        if (++totalSupply * 10**18 >= nextPrice * slowFactor) {
+            uint256 oldPrice = price;
+            price = nextPrice;
+            nextPrice += oldPrice;
+        }
+        _safeMint(_to, uint256(uint160(_to)));
     }
 
     function teamMint(address _to) public {
@@ -41,28 +41,17 @@ contract SVGie is ERC721TGNT {
     }
 
     function burn(uint256 tokenId) public virtual {
-    // function burn() public virtual {
         if (msg.sender != ownerOf(tokenId)) revert NotOwnerOf(tokenId);
         totalSupply--;
         _burn(tokenId);
-        // _burn(uint256(uint160(msg.sender)));
     }
-
-    // function teamBurn(uint256 tokenId) public {
-    //     if (msg.sender != owner) revert OnlyOwner();
-    //     totalSupply--;
-    //     _burn(tokenId);
-    // }
 
     function tokenURI(uint256 tokenId)
         public
         view
-        // override(ERC721NonTransf)
         override(ERC721TGNT)
-        // override(ERC721)
         returns (string memory)
     {
-        // if (!_exists(tokenId)) revert NonExistentToken(tokenId);
         require(_exists(tokenId), "SVGie: Non Existent TokenId");
         return
             TokenURIDescriptor.tokenURI(
@@ -99,6 +88,24 @@ contract SVGie is ERC721TGNT {
         price = mintPrice;
     }
 
+    function getNextPrice() public view returns (uint256) {
+        return nextPrice;
+    }
+
+    function setNextPrice(uint256 mintPrice) public {
+        if (msg.sender != owner) revert OnlyOwner();
+        nextPrice = mintPrice;
+    }
+
+    function getSlowFactor() public view returns (uint256) {
+        return slowFactor;
+    }
+
+    function setSlowFactor(uint256 factor) public {
+        if (msg.sender != owner) revert OnlyOwner();
+        slowFactor = factor;
+    }
+
     function isMintActive() public view returns (bool) {
         return mintActive;
     }
@@ -113,7 +120,6 @@ contract SVGie is ERC721TGNT {
     }
 
     function withdraw() public {
-        // if (msg.sender != owner) revert OnlyOwner();
         uint256 amount = address(this).balance;
         bool success;
         // Revert if no funds
