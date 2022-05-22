@@ -9,7 +9,6 @@ contract SVGie is ERC721TGNT {
     address private owner;
     address private donationAddress;
     uint256 private totalSupply;
-    uint256 private totalSold;
     uint256 private price;
     uint256 private nextPrice;
     uint256 private slowFactor;
