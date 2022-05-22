@@ -1,14 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.12;
 
-// import "./lib/ERC721/ERC721NonTransf.sol";
 import "@7i7o/tokengate/src/ERC721TGNT.sol";
-// import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import { TokenURIDescriptor } from "./lib/TokenURIDescriptor.sol";
 
-// contract SVGie is ERC721NonTransf {
 contract SVGie is ERC721TGNT {
-// contract SVGie is ERC721 {
 
     address private owner;
     address private donationAddress;
