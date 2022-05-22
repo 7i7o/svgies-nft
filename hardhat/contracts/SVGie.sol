@@ -26,7 +26,7 @@ contract SVGie is ERC721TGNT {
     function safeMint(address _to) public payable {
         require(mintActive, "Mint is not active");
         require(msg.value >= price, "Value sent < Mint Price");
-        if (++totalSupply >= nextPrice * slowFactor) {
+        if (++totalSupply * 10**18 >= nextPrice * slowFactor) {
             uint256 oldPrice = price;
             price = nextPrice;
             nextPrice += oldPrice;
