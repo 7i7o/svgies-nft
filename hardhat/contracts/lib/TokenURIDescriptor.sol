@@ -3,7 +3,7 @@ pragma solidity 0.8.12;
 
 import { Base64 } from './Base64.sol';
 
-string constant SVGa = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 8 32 32" width="200" height="200">'
+string constant SVGa = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="8 8 32 32" width="300" height="300">'
                             '<radialGradient id="'; // C0 C1
 string constant SVGb = '"><stop stop-color="#'; // C0
 string constant SVGc = '" offset="0"></stop><stop stop-color="#'; // C1

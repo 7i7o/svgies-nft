@@ -4,7 +4,7 @@ const waffle = hre.waffle;
 
 const CONTRACT_NAME = 'SVGie';
 // const MINT_PRICE = '0.01' // in Eth/Matic
-const MINT_PRICE = '15' // in Eth/Matic
+const MINT_PRICE = '1' // in Eth/Matic
 // Mumbai 00: 0xacB69A6A9c5AA171Addd0a178507154345654bF9
 // const CONTRACT_ADDRESS = '0xacB69A6A9c5AA171Addd0a178507154345654bF9';
 
@@ -83,8 +83,14 @@ async function main() {
   // balance = await contract.provider.getBalance(contract.address)
   // console.log("Contract Balance: ", balance)
 
+  // setSlowFactor
+  // tx = await contract.setSlowFactor(2)
+  // txReceipt = await tx.wait()
+  // gasUsed = txReceipt.gasUsed;
+  // console.log(' - setSlowFactor used ',gasUsed.toNumber(),' gas')
+
   // Mint 1 NFT by Team
-  tx = await contract.teamMint()
+  tx = await contract.teamMint(WALLETMM)
   txReceipt = await tx.wait()
   gasUsed = txReceipt.gasUsed;
   console.log(' - teamMint used ',gasUsed.toNumber(),' gas')

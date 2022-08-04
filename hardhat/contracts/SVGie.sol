@@ -2,10 +2,9 @@
 pragma solidity 0.8.12;
 
 import "@7i7o/tokengate/src/ERC721TGNT.sol";
-import { TokenURIDescriptor } from "./lib/TokenURIDescriptor.sol";
+import {TokenURIDescriptor} from "./lib/TokenURIDescriptor.sol";
 
 contract SVGie is ERC721TGNT {
-
     address private owner;
     address private donationAddress;
     uint256 private totalSupply;
@@ -18,7 +17,7 @@ contract SVGie is ERC721TGNT {
 
     error OnlyOwner();
 
-    constructor(uint256 mintPrice) ERC721TGNT("SVGie", "SVGie") {
+    constructor(uint256 mintPrice) ERC721TGNT("Test", "Test") {
         owner = msg.sender;
         nextPrice = mintPrice;
     }
@@ -123,18 +122,17 @@ contract SVGie is ERC721TGNT {
         uint256 amount = address(this).balance;
         bool success;
         // Revert if no funds
-        require(amount > 0,"Balance is 0");
+        require(amount > 0, "Balance is 0");
         // Withdraw funds.
         if (donationAddress == address(0x0)) {
             (success, ) = payable(owner).call{value: amount}("");
             require(success, "Withdraw failed");
             return;
         }
-        
+
         amount /= 2;
         (success, ) = payable(donationAddress).call{value: amount}("");
         (success, ) = payable(owner).call{value: address(this).balance}("");
         require(success, "Withdraw failed");
     }
-
 }
